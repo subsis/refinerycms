@@ -73,7 +73,10 @@ module Refinery
       # Live pages are 'allowed' to be shown in the frontend of your website.
       # By default, this is all pages that are not set as 'draft'.
       def live
-        where(:draft => false)
+        where(:draft => false).
+          joins(:page_publications).
+          where(:refinery_page_publications => { :locale => ::Refinery::I18n.current_frontend_locale }).
+          where("refinery_page_publications.publish_at < ?", Time.zone.now)
       end
 
       # With slugs scoped to the parent page we need to find a page by its full path.
@@ -320,7 +323,7 @@ module Refinery
 
     # Returns true if this page is "published"
     def live?
-      not draft?
+      not draft? and published?
     end
 
     # Return true if this page can be shown in the navigation.
@@ -331,6 +334,10 @@ module Refinery
 
     def not_in_menu?
       not in_menu?
+    end
+
+    def published?(locale = ::Refinery::I18n.current_frontend_locale)
+      page_publications.find_by_locale(locale).publish_at < Time.zone.now
     end
 
     # Returns true if this page is the home page or links to it.
