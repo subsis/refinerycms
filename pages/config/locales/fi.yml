@@ -44,6 +44,7 @@ fi:
           create_content_section: Lisää sisältöosio
           delete_content_section: Poista sisältöosio
         form_advanced_options:
+          publish_at: "Publish at:"
           toggle_advanced_options: "Näe metatieto- ja valikko-ominaisuudet"
           page_options: Sivun ominaisuudet
           parent_page: Yläsivu

@@ -50,6 +50,7 @@ en:
           delete_content_section: Delete content section
           reorder_content_section: Reorder content sections
         form_advanced_options:
+          publish_at: "Publish at:"
           toggle_advanced_options: Access meta tag settings and menu options
           page_options: Page Options
           parent_page: Parent page

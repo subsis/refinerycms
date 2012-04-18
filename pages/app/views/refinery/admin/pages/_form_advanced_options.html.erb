@@ -1,4 +1,11 @@
 <div id='more_options_field'>
+  <span id='publish_at_field'>
+    <%= f.fields_for :page_publications, @page.page_publications.find_or_initialize_by_locale(::Globalize.locale) do |publication| %>
+      <%= publication.hidden_field :locale %>
+      <%= publication.label :publish_at, t('.publish_at') %>
+      <%= publication.datetime_select :publish_at, :minute_step => 15, :default => 1.week.from_now %>
+    <% end %>
+  </span>
   <p>
     <%= link_to t('.advanced_options'), "#",
                 :id => 'toggle_advanced_options',

@@ -44,6 +44,7 @@ nb:
           create_content_section: Legg til innholdsseksjon
           delete_content_section: Slett innholdsseksjon
         form_advanced_options:
+          publish_at: "Publish at:"
           toggle_advanced_options: Klikk for å få tilgang til meta tag innstillinger og meny alternativer
           page_options: Alternativer for siden
           parent_page: Overliggende side
@@ -72,4 +73,3 @@ nb:
     attributes:
       refinery/page:
         title: Tittel
-        
