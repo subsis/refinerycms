@@ -359,7 +359,11 @@ module Refinery
     end
 
     def published?(locale = ::Refinery::I18n.current_frontend_locale)
-      page_publications.find_by_locale(locale).publish_at < Time.zone.now
+      page_publication = page_publications.find_by_locale(locale)
+
+      return if page_publication.nil?
+
+      page_publication.publish_at < Time.zone.now
     end
 
     # Returns true if this page is the home page or links to it.
