@@ -15,11 +15,17 @@ module Refinery
     seo_fields = ::SeoMeta.attributes.keys.map{|a| [a, :"#{a}="]}.flatten
     delegate(*(seo_fields << {:to => :translation}))
 
+    has_many :page_publications,
+             :class_name => '::Refinery::PagePublication',
+             :foreign_key => :refinery_page_id
+    accepts_nested_attributes_for :page_publications
+
     attr_accessible :id, :deletable, :link_url, :menu_match, :meta_keywords,
                     :skip_to_first_child, :position, :show_in_menu, :draft,
                     :parts_attributes, :browser_title, :meta_description,
                     :parent_id, :menu_title, :created_at, :updated_at,
-                    :page_id, :layout_template, :view_template, :custom_slug
+                    :page_id, :layout_template, :view_template, :custom_slug,
+                    :page_publications_attributes
 
     attr_accessor :locale, :page_title, :page_menu_title # to hold temporarily
     validates :title, :presence => true
