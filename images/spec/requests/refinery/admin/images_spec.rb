@@ -41,6 +41,19 @@ module Refinery
 
         response.should be_success
       end
+
+      it "allows setting alt text for new images", :js => true do
+        visit refinery_admin_images_path
+        click_link "Add new image"
+
+        attach_file "image_image", Refinery.roots(:'refinery/images').join("spec/fixtures/beach.jpeg")
+        fill_in "Alt Text", :with => "A beautiful beach scene."
+
+        click_button "Save"
+
+        page.should have_content("'A beautiful beach scene.' was successfully added.")
+        Refinery::Image.count.should == 1
+      end
     end
 
     context "when an image exists" do
@@ -64,6 +77,21 @@ module Refinery
 
           lambda { click_link "View this image" }.should_not raise_error
         end
+
+      it "updates image's alt text" do
+        visit refinery_admin_images_path
+        page.should have_selector("a[href='/refinery/images/#{image.id}/edit']")
+
+        click_link "Edit this image"
+
+        fill_in "Alt Text", :with => "Descriptive text."
+        click_button "Save"
+
+        page.should have_content("'Descriptive text.' was successfully updated.")
+        Refinery::Image.count.should == 1
+      end
+    end
+
       end
 
       context "destroy" do

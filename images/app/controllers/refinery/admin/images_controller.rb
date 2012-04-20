@@ -5,9 +5,30 @@ module ::Refinery
       crudify :'refinery/image',
               :order => "created_at DESC",
               :sortable => false,
+              :include => [:translations],
               :xhr_paging => true
 
-      before_filter :change_list_mode_if_specified, :init_dialog
+      before_filter :change_list_mode_if_specified, :init_dialog, :set_locale
+
+      def index
+        if searching?
+          search_all_images
+        else
+          join_condition = ::Refinery::Image.send(
+            :sanitize_sql_array,
+            ["LEFT JOIN refinery_image_translations
+              ON refinery_image_id = refinery_images.id AND locale = ?",
+              params[:switch_locale]
+            ]
+          )
+
+          @images = ::Refinery::Image.joins().where("alt IS NULL").order("refinery_images.id DESC") if params[:switch_locale]
+        end
+
+        paginate_all_images
+
+        render_partial_response?
+      end
 
       def new
         @image = ::Refinery::Image.new if @image.nil?
@@ -30,7 +51,11 @@ module ::Refinery
         end
 
         find_all_images(({extra_condition[0].to_sym => extra_condition[1]} if extra_condition.present?))
-        search_all_images if searching?
+        if searching?
+          search_all_images
+        else
+          @images = ::Refinery::Image.with_translations(Globalize.locale)
+        end
 
         paginate_images
 
@@ -38,15 +63,10 @@ module ::Refinery
       end
 
       def create
-        @images = []
         begin
-          unless params[:image].present? and params[:image][:image].is_a?(Array)
-            @images << (@image = ::Refinery::Image.create(params[:image]))
-          else
-            params[:image][:image].each do |image|
-              @images << (@image = ::Refinery::Image.create(:image => image))
-            end
-          end
+          @images = images_from_params
+
+          @image = @images.last
         rescue Dragonfly::FunctionManager::UnableToHandle
           logger.warn($!.message)
           @image = ::Refinery::Image.new
@@ -78,6 +98,25 @@ module ::Refinery
 
     protected
 
+      def images_from_params
+        image_params.map { |image| ::Refinery::Image.create image }
+      end
+
+      def image_params
+        case
+        when params[:image].nil?
+          []
+        when params[:image][:image].nil?
+          [params[:image]]
+        else
+          alt = params[:image][:alt]
+
+          params[:image][:image].dup.map! do |image|
+            { :image => image, :alt => alt }
+          end
+        end
+      end
+
       def init_dialog
         @app_dialog = params[:app_dialog].present?
         @field = params[:field]
@@ -105,6 +144,9 @@ module ::Refinery
         super unless action_name == 'insert' or from_dialog?
       end
 
+      def set_locale
+        Globalize.locale = params[:switch_locale] if params[:switch_locale]
+      end
     end
   end
 end

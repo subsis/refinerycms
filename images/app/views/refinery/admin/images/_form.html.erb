@@ -5,6 +5,12 @@
              :object => @image,
              :include_object_name => false %>
 
+  <% unless @app_dialog or action_name == "insert" %>
+    <%= render 'locale_picker', :current_locale => Globalize.locale if Refinery.i18n_enabled? %>
+  <% end %>
+
+  <%= f.hidden_field :locale, value: ::Globalize.locale %>
+
   <div class='field'>
     <% if action_name =~ /(edit)|(update)/ %>
       <p>
@@ -22,6 +28,11 @@
 
   <div class='field'>
     <label><%= t('.maximum_image_size', :bytes => number_to_human_size(Refinery::Images.max_image_size)) %></label>
+  </div>
+
+  <div class='field'>
+    <%= f.label :alt %>
+    <%= f.text_field :alt, :class => 'widest' %>
   </div>
 
   <input type='hidden' name='wymeditor' value='<%= params[:wymeditor] %>'>
