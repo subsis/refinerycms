@@ -14,7 +14,7 @@ module ::Refinery
         if searching?
           search_all_images
         else
-          @images = ::Refinery::Image.missing_translations_for(params[:switch_locale]) if params[:switch_locale]
+          @images = ::Refinery::Image.missing_translations_for(params[:switch_locale]).where("refinery_images.created_at > ?", 1.month.ago).order("refinery_images.id DESC") if params[:switch_locale]
         end
 
         paginate_all_images

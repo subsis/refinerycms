@@ -43,7 +43,7 @@ module Refinery
           ]
         )
 
-        joins(join_conditions).where("filename IS NULL").order("refinery_images.id DESC")
+        joins(join_conditions).where("filename IS NULL")
       end
     end
 
