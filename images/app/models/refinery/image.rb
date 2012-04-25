@@ -13,11 +13,13 @@ module Refinery
     acts_as_indexed :fields => [:title]
 
     # allows Mass-Assignment
-    attr_accessible :id, :image, :image_size, :alt
+    attr_accessible :id, :image, :image_size, :filename, :alt
 
     delegate :size, :mime_type, :url, :width, :height, :to => :image
 
-    translates :alt
+    validates_presence_of :filename, :alt
+
+    translates :filename, :alt
 
     class << self
       # How many images per page should be displayed?
@@ -31,6 +33,17 @@ module Refinery
         else
           Images.pages_per_admin_index
         end
+      end
+
+      def missing_translations_for(locale)
+        join_conditions = sanitize_sql_array(
+          ["LEFT JOIN refinery_image_translations
+            ON refinery_image_id = refinery_images.id AND locale = ?",
+            locale
+          ]
+        )
+
+        joins(join_conditions).where("filename IS NULL").order("refinery_images.id DESC")
       end
     end
 

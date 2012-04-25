@@ -45,4 +45,5 @@ en:
           incorrect_format: 'Your image must be either a JPG, PNG or GIF'
     attributes:
       refinery/image:
+        filename: "Filename"
         alt: "Alt Text"

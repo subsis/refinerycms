@@ -14,15 +14,7 @@ module ::Refinery
         if searching?
           search_all_images
         else
-          join_condition = ::Refinery::Image.send(
-            :sanitize_sql_array,
-            ["LEFT JOIN refinery_image_translations
-              ON refinery_image_id = refinery_images.id AND locale = ?",
-              params[:switch_locale]
-            ]
-          )
-
-          @images = ::Refinery::Image.joins().where("alt IS NULL").order("refinery_images.id DESC") if params[:switch_locale]
+          @images = ::Refinery::Image.missing_translations_for(params[:switch_locale]) if params[:switch_locale]
         end
 
         paginate_all_images
@@ -109,10 +101,11 @@ module ::Refinery
         when params[:image][:image].nil?
           [params[:image]]
         else
-          alt = params[:image][:alt]
+          alt      = params[:image][:alt]
+          filename = params[:image][:filename]
 
           params[:image][:image].dup.map! do |image|
-            { :image => image, :alt => alt }
+            { :image => image, :alt => alt, :filename => filename }
           end
         end
       end
