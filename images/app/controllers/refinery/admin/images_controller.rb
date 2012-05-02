@@ -46,7 +46,7 @@ module ::Refinery
         if searching?
           search_all_images
         else
-          @images = ::Refinery::Image.with_translations(Globalize.locale)
+          @images = ::Refinery::Image.with_translations(Globalize.locale).order("refinery_images.id DESC")
         end
 
         paginate_images
